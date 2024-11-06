@@ -77,6 +77,7 @@ def cruzamento(pai1, pai2):
 
     tamanho = len(pai1)
     filho = [-1] * tamanho
+    
     inicio, fim = sorted(random.sample(range(tamanho), 2))
     filho[inicio:fim] = pai1[inicio:fim]
 
@@ -111,8 +112,6 @@ def mutacao(rota, taxa_mutacao, pontos):
     if random.random() < taxa_mutacao:
         i, j = random.sample(range(len(rota)), 2)
         rota[i], rota[j] = rota[j], rota[i]
-
-    rota = inverter_rota(rota, pontos)
 
     return inverter_rota(rota, pontos)
 
