@@ -29,27 +29,27 @@ O código é dividido em várias funções que executam as operações principai
     - `pontos`: Lista de pontos para visitação.
   - **Retorno**: Lista com a ordem de visitação dos pontos.
 
-- **`selecao(populacao, aptidao_pop)`**: Seleciona um caminho com base no método de torneio.
+- **`selecao(populacao, aptidoes)`**: Seleciona um caminho com base no método de torneio.
   - **Parâmetros**: 
     - `populacao`: Lista de caminhos.
-    - `aptidao_pop`: Lista de valores de aptidão correspondentes.
-  - **Retorno**: Caminho selecionado para cruzamento.
+    - `aptidoes`: Lista de valores de aptidão correspondentes.
+  - **Retorno**: Rota selecionado para cruzamento.
 
 - **`cruzamento(pai1, pai2)`**: Realiza o cruzamento de dois caminhos, gerando um filho.
   - **Parâmetros**: 
     - `pai1`, `pai2`: Listas representando os pais.
-  - **Retorno**: Caminho resultante do cruzamento.
+  - **Retorno**: Rota resultante do cruzamento.
 
 - **`mutacao(caminho, taxa_mutacao, pontos)`**: Aplica mutação e melhora o caminho por inversão.
   - **Parâmetros**: 
     - `caminho`: Lista com a ordem dos pontos.
     - `taxa_mutacao`: Taxa de mutação aplicada.
     - `pontos`: Lista de pontos.
-  - **Retorno**: Caminho mutado e otimizado.
+  - **Retorno**: Rota mutado e otimizado.
 
 - **`nova_geracao_com_elitismo(populacao, fitness_pop, taxa_mutacao, pontos, elitismo=True)`**: Gera uma nova população, preservando o melhor caminho da geração anterior.
   - **Parâmetros**: 
-    - `populacao`, `aptidao_pop`, `taxa_mutacao`, `pontos`, `elitismo`.
+    - `populacao`, `aptidoes`, `taxa_mutacao`, `pontos`, `elitismo`.
   - **Retorno**: Nova população.
 
 - **`algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_mutacao=0.08, elitismo=True)`**: Função principal do algoritmo.
@@ -61,9 +61,9 @@ O código é dividido em várias funções que executam as operações principai
     - `elitismo`: Habilita/desabilita o elitismo.
   - **Retorno**: Melhor caminho encontrado e histórico de aptidão.
 
-- **`gerar_pontos_circulares(quantidade, raio=10)`** e **`gerar_pontos_uniformes(quantidade, limite=10)`**: Geram pontos para o problema.
+- **`criar_pontos_circulares(quantidade, raio=10)`** e **`gerar_pontos_uniformes(quantidade, limite=10)`**: Geram pontos para o problema.
 
-- **`plotar_caminho(pontos, caminho, titulo="Caminho")`**: Plota o caminho final.
+- **`plotar_caminho(pontos, caminho, titulo="Rota")`**: Plota o caminho final.
 
 ### 3.2 Passo a Passo do Funcionamento
 1. **Inicialização**: A população inicial é gerada aleatoriamente.
@@ -85,10 +85,10 @@ Para testar o algoritmo:
 # Geração de pontos uniformemente distribuídos
 pontos_uniformes = gerar_pontos_uniformes(15)
 melhor_caminho, historico = algoritmo_genetico(pontos_uniformes)
-plotar_caminho(pontos_uniformes, melhor_caminho, "Caminho Uniforme")
+plotar_caminho(pontos_uniformes, melhor_caminho, "Rota Uniforme")
 
 # Geração de pontos circulares
-pontos_circulares = gerar_pontos_circulares(15)
+pontos_circulares = criar_pontos_circulares(15)
 melhor_caminho, historico = algoritmo_genetico(pontos_circulares)
-plotar_caminho(pontos_circulares, melhor_caminho, "Caminho Circular")
+plotar_caminho(pontos_circulares, melhor_caminho, "Rota Circular")
 

@@ -89,87 +89,79 @@ def cruzamento(pai1, pai2):
 
     return filho
 
+# Função para inverter dois pontos adjacentes no rota e verificar se melhora a distância total
 def inverter_rota(rota, pontos):
-    """
-    Realiza uma melhoria no rota trocando duas cidades e verificando se a inversão melhora a distância.
-    """
-
+    melhor = False
     for i in range(1, len(rota) - 1):
-        distancia_atual = (distancia(pontos[rota[i-1]], pontos[rota[i]]) + distancia(pontos[rota[i]], pontos[rota[i+1]]))
-        distancia_invertida = (distancia(pontos[rota[i-1]], pontos[rota[i+1]]) + distancia(pontos[rota[i+1]], pontos[rota[i]]))
-
-        if distancia_invertida < distancia_atual:
+        dist_atual = (distancia(pontos[rota[i-1]], pontos[rota[i]]) + 
+                      distancia(pontos[rota[i]], pontos[rota[i+1]]))
+        
+        dist_invertida = (distancia(pontos[rota[i-1]], pontos[rota[i+1]]) + 
+                          distancia(pontos[rota[i+1]], pontos[rota[i]]))
+        
+        if dist_invertida < dist_atual:
             rota[i], rota[i+1] = rota[i+1], rota[i]
+            melhor = True
+    return rota, melhor
 
-    return rota
-
+# Mutação (Troca de duas cidades e melhoria por inversão)
 def mutacao(rota, taxa_mutacao, pontos):
-    """
-    Realiza uma mutação no rota trocando duas cidades aleatórias.
-    """
-
     if random.random() < taxa_mutacao:
         i, j = random.sample(range(len(rota)), 2)
         rota[i], rota[j] = rota[j], rota[i]
+    
+    rota, melhor = inverter_rota(rota, pontos)
+    
+    return rota
 
-    rota = inverter_rota(rota, pontos)
-
-    return inverter_rota(rota, pontos)
-
-def elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite=True):
-    """
-    Gera uma nova população com base na aptidão dos indivíduos da geração anterior.
-    """
-
+# Função para criar uma nova geração, incluindo elitismo
+def nova_geracao_com_elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite=True):
     nova_populacao = []
-
+    
     if elite:
         melhor_indice = np.argmax(aptidoes)
         melhor_individuo = populacao[melhor_indice]
         nova_populacao.append(melhor_individuo)
-
+    
     for _ in range(len(populacao) - len(nova_populacao)):
         pai1 = selecao(populacao, aptidoes)
         pai2 = selecao(populacao, aptidoes)
         filho = cruzamento(pai1, pai2)
         filho = mutacao(filho, taxa_mutacao, pontos)
         nova_populacao.append(filho)
-
+    
     return nova_populacao
 
+# Função principal do algoritmo genético com elite
 def algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_mutacao=0.08, elite=True):
-    """
-    Algoritmo Genético para resolver o Problema do Caixeiro Viajante.
-    """
-
     populacao = [criar_rota_aleatoria(pontos) for _ in range(tamanho_populacao)]
     historico_aptidao = []
 
-    melhor_rota = None
+    melhor_caminho = None
 
     # Configurações do gráfico do rota
-    plt.figure(figsize=(9, 9))
-    plt.title("rota")
-    plt.xlim(-15, 15)  # Ajuste o limite conforme necessário
-    plt.ylim(-15, 15)
+    plt.figure(figsize=(6, 6))
+    plt.title("Rota")
+    plt.xlim(-12, 12)  # Ajuste o limite conforme necessário
+    plt.ylim(-12, 12)
     plt.ion()  # Ativa o modo interativo
     linha, = plt.plot([], [], 'bo-', marker='o')  # Linha vazia para atualização
 
     for geracao in range(num_geracoes):
         aptidoes = [aptidao(rota, pontos) for rota in populacao]
         melhor_aptidao = max(aptidoes)
-        melhor_rota = populacao[aptidoes.index(melhor_aptidao)]
+        melhor_caminho = populacao[aptidoes.index(melhor_aptidao)]
         historico_aptidao.append(1 / melhor_aptidao)
 
         print(f"Geração {geracao + 1}: Melhor distância: {1 / melhor_aptidao}")
 
-        populacao = elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite)
+        populacao = nova_geracao_com_elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite)
 
         # Atualizar gráfico do rota a cada 10 gerações
         if (geracao + 1) % 10 == 0:
-            rota_completo = melhor_rota + [melhor_rota[0]]  # Volta ao ponto inicial
-            x = [pontos[i][0] for i in rota_completo]
-            y = [pontos[i][1] for i in rota_completo]
+            caminho_completo = melhor_caminho + [melhor_caminho[0]]  # Volta ao ponto inicial
+            x = [pontos[i][0] for i in caminho_completo]
+            y = [pontos[i][1] for i in caminho_completo]
             linha.set_xdata(x)
             linha.set_ydata(y)
             plt.draw()
@@ -178,25 +170,28 @@ def algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_muta
     plt.ioff()  # Desativa o modo interativo
     plt.show()  # Exibe o gráfico final
 
-    return melhor_rota, historico_aptidao
+    return melhor_caminho, historico_aptidao
 
 
 
-# -------------- MAIN --------------
 
-# Teste Pontos Uniformes - 15 pontos
-pontos_uniformes = criar_pontos_uniformes(15)
-melhor_rota, historico = algoritmo_genetico(pontos_uniformes)
-plotar_rota(pontos_uniformes, melhor_rota, "Rota Uniforme")
 
-# Teste Pontos Circulares - 15 pontos
-pontos_circulares = criar_pontos_circulares(15)
+
+# Testando com pontos dispostos em círculo
+pontos_circulares = criar_pontos_circulares(25)
 melhor_rota, historico = algoritmo_genetico(pontos_circulares)
+
 plotar_rota(pontos_circulares, melhor_rota, "Rota Circular")
 
-# Plotar histórico de aptidão
+# Testando com pontos aleatórios (uniformemente distribuídos)
+pontos_uniformes = criar_pontos_uniformes(25)
+melhor_rota, historico = algoritmo_genetico(pontos_uniformes)
+
+plotar_rota(pontos_uniformes, melhor_rota, "Rota Uniforme")
+
+# Plotar histórico de aptidao (melhor distância ao longo das gerações)
 plt.plot(historico)
-plt.title("Evolução da aptidão ao Longo das Gerações")
+plt.title("Evolução do aptidao ao Longo das Gerações")
 plt.xlabel("Geração")
 plt.ylabel("Melhor Distância")
 plt.show()
