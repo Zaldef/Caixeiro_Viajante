@@ -136,7 +136,7 @@ def elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite=True):
 
     return nova_populacao
 
-def algoritmo_genetico(pontos, teste, tamanho_populacao=100, num_geracoes=50, taxa_mutacao=0.08, elite=True):
+def algoritmo_genetico(pontos, teste, tamanho_populacao=200, num_geracoes=200, taxa_mutacao=0.16, elite=True):
     """
     Algoritmo Genético para resolver o Problema do Caixeiro Viajante.
     """
@@ -181,13 +181,13 @@ def algoritmo_genetico(pontos, teste, tamanho_populacao=100, num_geracoes=50, ta
 # -------------- MAIN --------------
 
 # Teste Pontos Uniformes - 15 pontos
-pontos_uniformes = criar_pontos_uniformes(15)
+pontos_uniformes = criar_pontos_uniformes(150)
 plotar_rota(pontos_uniformes, criar_rota_aleatoria(pontos_uniformes), "Pontos Uniformes Aleatórios")
 melhor_rota, historico = algoritmo_genetico(pontos_uniformes,"Pontos Uniformes ")
 plotar_rota(pontos_uniformes, melhor_rota, "Rota Uniforme Otimizida")
 
 ## Teste Pontos Circulares - 15 pontos
-pontos_circulares = criar_pontos_circulares(15)
+pontos_circulares = criar_pontos_circulares(150)
 plotar_rota(pontos_circulares, criar_rota_aleatoria(pontos_circulares), "Pontos Circulares Aleatórios")
 melhor_rota, historico = algoritmo_genetico(pontos_circulares,"Pontos Circulares")
 plotar_rota(pontos_circulares, melhor_rota, "Rota Circular otimizada")
