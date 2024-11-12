@@ -28,7 +28,7 @@ def criar_rota_aleatoria(pontos):
 
     return rota
 
-def plotar_rota(pontos, rota, titulo="Rota"):
+def plotar_rota(pontos, rota, titulo):
     """
     Plota a rota final que passa por todos os pontos.
     """
@@ -39,8 +39,8 @@ def plotar_rota(pontos, rota, titulo="Rota"):
 
     plt.figure(figsize=(9, 9))
     plt.plot(x, y, marker='o')
-    plt.title(titulo)
-    plt.show()
+    plt.title(f"{titulo}: Melhor distância = {1/ aptidao(rota, pontos)}")
+    plt.savefig(titulo, dpi=300)
 
 def distancia(ponto1, ponto2):
     """
@@ -136,7 +136,7 @@ def elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite=True):
 
     return nova_populacao
 
-def algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_mutacao=0.08, elite=True):
+def algoritmo_genetico(pontos, teste, tamanho_populacao=100, num_geracoes=50, taxa_mutacao=0.08, elite=True):
     """
     Algoritmo Genético para resolver o Problema do Caixeiro Viajante.
     """
@@ -145,14 +145,6 @@ def algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_muta
     historico_aptidao = []
 
     melhor_rota = None
-
-    # Configurações do gráfico do rota
-    plt.figure(figsize=(9, 9))
-    plt.title("rota")
-    plt.xlim(-15, 15)  # Ajuste o limite conforme necessário
-    plt.ylim(-15, 15)
-    plt.ion()  # Ativa o modo interativo
-    linha, = plt.plot([], [], 'bo-', marker='o')  # Linha vazia para atualização
 
     for geracao in range(num_geracoes):
         aptidoes = [aptidao(rota, pontos) for rota in populacao]
@@ -164,18 +156,23 @@ def algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_muta
 
         populacao = elitismo(populacao, aptidoes, taxa_mutacao, pontos, elite)
 
-        # Atualizar gráfico do rota a cada 10 gerações
+         # Atualizar gráfico do rota a cada 10 gerações
         if (geracao + 1) % 10 == 0:
+            # Desenha a melhor rota da geração
             rota_completo = melhor_rota + [melhor_rota[0]]  # Volta ao ponto inicial
             x = [pontos[i][0] for i in rota_completo]
             y = [pontos[i][1] for i in rota_completo]
-            linha.set_xdata(x)
-            linha.set_ydata(y)
-            plt.draw()
-            plt.pause(1.0)  # Pausa para atualizar o gráfico
 
-    plt.ioff()  # Desativa o modo interativo
-    plt.show()  # Exibe o gráfico final
+            plt.clf()  # Limpa o gráfico anterior
+            plt.scatter([p[0] for p in pontos], [p[1] for p in pontos], color='red')  # Plota os pontos
+            plt.plot(x, y, 'b-', marker='o', markersize=5)  # Plota a rota atual
+            plt.title(f"Geração {geracao + 1}: Melhor distância = {1 / melhor_aptidao}")
+            plt.xlim(-15, 15)  # Ajuste os limites conforme seus dados
+            plt.ylim(-15, 15)
+
+            # Salva a imagem da rota
+            plt.savefig(f'{teste}_gen_{geracao + 1}.png', dpi=300)
+
 
     return melhor_rota, historico_aptidao
 
@@ -185,17 +182,20 @@ def algoritmo_genetico(pontos, tamanho_populacao=100, num_geracoes=50, taxa_muta
 
 # Teste Pontos Uniformes - 15 pontos
 pontos_uniformes = criar_pontos_uniformes(15)
-melhor_rota, historico = algoritmo_genetico(pontos_uniformes)
-plotar_rota(pontos_uniformes, melhor_rota, "Rota Uniforme")
+plotar_rota(pontos_uniformes, criar_rota_aleatoria(pontos_uniformes), "Pontos Uniformes Aleatórios")
+melhor_rota, historico = algoritmo_genetico(pontos_uniformes,"Pontos Uniformes ")
+plotar_rota(pontos_uniformes, melhor_rota, "Rota Uniforme Otimizida")
 
-# Teste Pontos Circulares - 15 pontos
+## Teste Pontos Circulares - 15 pontos
 pontos_circulares = criar_pontos_circulares(15)
-melhor_rota, historico = algoritmo_genetico(pontos_circulares)
-plotar_rota(pontos_circulares, melhor_rota, "Rota Circular")
+plotar_rota(pontos_circulares, criar_rota_aleatoria(pontos_circulares), "Pontos Circulares Aleatórios")
+melhor_rota, historico = algoritmo_genetico(pontos_circulares,"Pontos Circulares")
+plotar_rota(pontos_circulares, melhor_rota, "Rota Circular otimizada")
 
 # Plotar histórico de aptidão
+plt.clf()
 plt.plot(historico)
 plt.title("Evolução da aptidão ao Longo das Gerações")
 plt.xlabel("Geração")
 plt.ylabel("Melhor Distância")
-plt.show()
+plt.savefig('historico_aptidao', dpi=300)
